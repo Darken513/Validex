@@ -10,6 +10,7 @@ class MatplotlibWidget(QtGui.QWidget):
         self.listX = dataDict["listX"]
         self.listY = dataDict["listY"]
         self.slope = dataDict["slope"]
+        self.r_value = dataDict["r_value"]
         self.intercept = dataDict["intercept"]
 
         # Create a Matplotlib figure and axes
@@ -27,6 +28,18 @@ class MatplotlibWidget(QtGui.QWidget):
         highX = max(self.listX) + gap/10
         regression_x = np.linspace(0 if lowX<0 else lowX, highX, 100)
         regression_y = [ self.intercept + self.slope*number for number in regression_x ]
+
+        # Add text annotations next to the chart
+        equation = str(round(self.intercept, 3))+" + "+str(round(self.slope, 3))+" . X"
+        self.axes.text(1.02, 0.9, "The equation : ", transform=self.axes.transAxes, fontsize=12, color='red')
+        self.axes.text(1.02, 0.84, equation, transform=self.axes.transAxes, fontsize=12, color='red')
+        self.axes.text(1.02, 0.72, 'Slope :' + str(round(self.slope, 6)), transform=self.axes.transAxes, fontsize=12, color='blue')
+        self.axes.text(1.02, 0.60, 'Intercept :' + str(round(self.intercept, 6)), transform=self.axes.transAxes, fontsize=12, color='green')
+        self.axes.text(1.02, 0.48, 'Correlation coefficient :', transform=self.axes.transAxes, fontsize=12, color='grey')
+        self.axes.text(1.02, 0.42, str(round(self.r_value, 6)), transform=self.axes.transAxes, fontsize=12, color='grey')
+        
+        # Adjust the size of the plot area to accommodate text annotations
+        plt.subplots_adjust(right=0.74, left=0.065)  # Increase the right margin
 
         # plot the line we think its best
         self.axes.plot(regression_x, regression_y)

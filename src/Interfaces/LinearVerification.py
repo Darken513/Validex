@@ -17,7 +17,14 @@ class Screen(QtGui.QWidget):
 
     def updateMainScreenUI(self):
         self.mainScreen.updateToolBarBtnsStyle(3)
-        self.mainScreen.rightWindow.setWidget(self)
+        #delete right side
+        item = self.mainScreen.layout.takeAt(1)
+        widget = item.widget()
+        self.mainScreen.layout.removeWidget(widget)
+        widget.setParent(None)
+        widget.deleteLater()
+        #draw new widget on the right side
+        self.mainScreen.layout.addWidget(self)
 
     def initToolBar(self):
         self.layout = QtGui.QVBoxLayout()
@@ -50,8 +57,14 @@ class Screen(QtGui.QWidget):
         # add the fact that some buttons are unclickable at first
 
     def initUI(self):
+        self.scrollAreaWidget = QtGui.QScrollArea()
+        self.contentHolderWidget = QtGui.QWidget()
+        self.contentHolderLayout = QtGui.QVBoxLayout()
+        self.contentHolderWidget.setLayout(self.contentHolderLayout)
+        self.layout.addWidget(self.scrollAreaWidget)
         self.calculateD1Details()
         self.redrawInner()
+        self.scrollAreaWidget.setWidget(self.contentHolderWidget)
 
     def initD1Screen(self):
         self.calculateD1Details()
@@ -69,48 +82,25 @@ class Screen(QtGui.QWidget):
             titleText = "D2 graph :"
         else:
             return #treat it in different method
-
+        
         # Delete all widgets under the layout
-        while self.layout.count()!=1:
-            item = self.layout.takeAt(1)
+        while self.contentHolderLayout.count():
+            item = self.contentHolderLayout.takeAt(0)
             widget = item.widget()
-            self.layout.removeWidget(widget)
+            self.contentHolderLayout.removeWidget(widget)
             widget.setParent(None)
             widget.deleteLater()
         
         #Redraw all
         title = QtGui.QLabel(titleText)
         title.setProperty('class', 'title')
-        self.layout.addWidget(title)
+        self.contentHolderLayout.addWidget(title)
 
         widget = LG.MatplotlibWidget(self.data)
-        self.layout.addWidget(widget)
-
-        equation = str(round(self.data["intercept"], 3))+" + "+str(round(self.data["slope"], 3))+" . X"
-        
-        self.addLabelValueGroup("The equation :", equation)
-        self.addLabelValueGroup("Slope :", str(round(self.data["slope"], 6)))
-        self.addLabelValueGroup("Intercept :", str(round(self.data["intercept"], 6)))
-        self.addLabelValueGroup("Correlation coefficient :", str(round(self.data["r_value"], 6)))
+        self.contentHolderLayout.addWidget(widget)
        
-        widget = IT.InterpretationTable(
-            [
-                'Homogenity of variances test',
-                'Slope existence test',
-                'validity of adjustments'
-            ],
-            [
-                'Calculated value',
-                'Tabulated value',
-                'Interpretation'
-            ],
-            [
-                [1,2,3],
-                [4,5,6],
-                [6,7,8]
-            ]
-        )
-        self.layout.addWidget(widget)
+        self.drawEquationDetailsTable()
+        self.drawInterpretationTable()
         
         self.setStyleSheet("""
             QLabel{
@@ -132,7 +122,8 @@ class Screen(QtGui.QWidget):
             QLabel.labelHolder{
                 max-width: 210px;
                 min-width: 210px;
-                color: rgb(210,120,120);
+                background-color: #79bbbc;
+                color: black;
             }
         """)
 
@@ -147,7 +138,46 @@ class Screen(QtGui.QWidget):
         layout.addWidget(labelHolder)
         layout.addWidget(valueHolder)
         layout.addStretch()
-        self.layout.addWidget(widget)
+        self.contentHolderLayout.addWidget(widget)
+    
+    def drawEquationDetailsTable(self):
+        equation = str(round(self.data["intercept"], 3))+" + "+str(round(self.data["slope"], 3))+" . X"
+        widget = IT.InterpretationTable(
+            [
+                "The equation",
+                "Slope",
+                "Intercept",
+                'Correlation coefficient'
+            ],
+            [], #no rows
+            [
+                [equation],
+                [str(round(self.data["slope"], 6))],
+                [str(round(self.data["intercept"], 6))],
+                [str(round(self.data["r_value"], 6))]
+            ]
+        )
+        self.contentHolderLayout.addWidget(widget)
+        
+    def drawInterpretationTable(self):
+        widget = IT.InterpretationTable(
+            [
+                'Homogenity of variances test',
+                'Slope existence test',
+                'validity of adjustments'
+            ],
+            [
+                'Calculated value',
+                'Tabulated value',
+                'Interpretation'
+            ],
+            [
+                [1,2,3],
+                [4,5,6],
+                [6,7,8]
+            ]
+        )
+        self.contentHolderLayout.addWidget(widget)
         
     def calculateD1Details(self):
         self.updateToolBarBtnsStyle(0)

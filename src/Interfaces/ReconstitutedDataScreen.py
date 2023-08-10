@@ -2,6 +2,7 @@ from PyQt4 import QtGui, QtCore
 from CustomWidgets.DataTable import DataTable
 import Utilities.Style as Style
 import Utilities.UtilFunc as UF
+import CustomWidgets.InterpretationTable as IT
 
 class Screen(QtGui.QWidget):
     def __init__(self, mainScreen):
@@ -12,7 +13,11 @@ class Screen(QtGui.QWidget):
         self.updateMainScreenUI()
         self.initUI()
         self.initData()
+        self.initMaxWidth()
 
+    def initMaxWidth(self):
+        self.mainScreen.layout.itemAt(0).widget().setMaximumWidth(self.mainScreen.data[self.seriesDatakey]*150 + 110)
+        
     def initParams(self):
         self.testDatakey = 'RSD_test_nbr'
         self.seriesDatakey = 'RSD_series_nbr'
