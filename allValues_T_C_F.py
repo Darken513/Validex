@@ -324,6 +324,6 @@ generalised by adapting Bernie's formula above (using offset(...-2,0,4,1) and
 ^{1,2,3}).
 """ 
 
-print(fisherCV(0.05,1,13))
+""" print(fisherCV(0.05,1,13))
 print(fisherCV(0.05,3,10))
-print(tStudentCV(0.05,26))
+print(tStudentCV(0.05,26)) """

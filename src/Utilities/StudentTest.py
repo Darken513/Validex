@@ -114,11 +114,11 @@ xy1 = [
 ]
 
 xy2 = [
-    [[97.2, 76521.0], [97, 75251.0], [96.8, 75297.0]], 
+    [[97.2, 76521.0], [97.0, 75251.0], [96.8, 75297.0]], 
     [[130.5, 102749.0], [131.2, 102210.0], [131.0, 102283.0]], 
-    [[161.1, 126779.0], [163, 127242.0], [161.2, 126801.0]], 
+    [[161.1, 126779.0], [163.0, 127242.0], [161.2, 126801.0]], 
     [[194.1, 153035.0], [194.1, 151598.0], [194.5, 153867.0]], 
-    [[226.4, 170584.0], [225.6, 176002.0], [225.9, 178332.0]]
+    [[226.4, 178584.0], [225.6, 176002.0], [225.9, 178332.0]]
 ]
 
 for j in range(n):
@@ -140,9 +140,9 @@ Yij2_flatten = math.calculateYij(n, m, b2, x2, y2, Xbars2).flatten()
 Vslope1 = slope_variance(x1, Xbars1, Yij1_flatten)
 Vslope2 = slope_variance(x2, Xbars2, Yij2_flatten)
 
-T_pente = calculate_TestT_pente(b1, b2, corelation1, corelation2, x1, x2, y1, y2)
+""" T_pente = calculate_TestT_pente(b1, b2, corelation1, corelation2, x1, x2, y1, y2)
 print(T_pente)
 T_ord = calculate_TestT_ord(a1, a2, corelation1, corelation2, x1, x2, y1, y2)
 print(T_ord)
 
-print(calculate_TestT_ord0(a2, corelation2, x2, y2))
+print(calculate_TestT_ord0(a2, corelation2, x2, y2)) """

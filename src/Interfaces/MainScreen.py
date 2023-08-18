@@ -6,24 +6,48 @@ import LinearVerification
 import Utilities.Style as Style
 
 EMPTY_DATA = {
-    "RSD_series_nbr": None,
-    "RSD_test_nbr": None,
-    "CSD_series_nbr": None,
-    "CSD_test_nbr": None,
-    "RD_full":None,
-    "CD_full":None,
+    "RSD_series_nbr": 5,
+    "RSD_test_nbr": 3,
+    "CSD_series_nbr": 5,
+    "CSD_test_nbr": 3,
+    "RD_full":[
+        [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
+        [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
+        [[161.8, 128105.0], [161.5, 126865.0], [161.2, 127788.0]], 
+        [[195.5, 155967.0], [195.3, 153848.0], [195.3, 153608.0]], 
+        [[227.8, 181879.0], [228.6, 180355.0], [228.2, 180909.0]]
+    ],
+    "CD_full":[
+        [[97.2, 76521.0], [97.0, 75251.0], [96.8, 75297.0]], 
+        [[130.5, 102749.0], [131.2, 102210.0], [131.0, 102283.0]], 
+        [[161.1, 126779.0], [163.0, 127242.0], [161.2, 126801.0]], 
+        [[194.1, 153035.0], [194.1, 151598.0], [194.5, 153867.0]], 
+        [[226.4, 178584.0], [225.6, 176002.0], [225.9, 178332.0]]
+    ],
 }
 
 class Screen(QtGui.QMainWindow):
     def __init__(self):
         super(Screen, self).__init__()
         self.data = {
-            "RSD_series_nbr": None,
-            "RSD_test_nbr": None,
-            "CSD_series_nbr": None,
-            "CSD_test_nbr": None,
-            "RD_full":None,
-            "CD_full":None,
+            "RSD_series_nbr": 5,
+            "RSD_test_nbr": 3,
+            "CSD_series_nbr": 5,
+            "CSD_test_nbr": 3,
+            "RD_full":[
+                [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
+                [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
+                [[161.8, 128105.0], [161.5, 126865.0], [161.2, 127788.0]], 
+                [[195.5, 155967.0], [195.3, 153848.0], [195.3, 153608.0]], 
+                [[227.8, 181879.0], [228.6, 180355.0], [228.2, 180909.0]]
+            ],
+            "CD_full":[
+                [[97.2, 76521.0], [97.0, 75251.0], [96.8, 75297.0]], 
+                [[130.5, 102749.0], [131.2, 102210.0], [131.0, 102283.0]], 
+                [[161.1, 126779.0], [163.0, 127242.0], [161.2, 126801.0]], 
+                [[194.1, 153035.0], [194.1, 151598.0], [194.5, 153867.0]], 
+                [[226.4, 178584.0], [225.6, 176002.0], [225.9, 178332.0]]
+            ],
         }
         self.toolBarBtns = []
         self.setWindowTitle("VALIDEX")
@@ -127,7 +151,15 @@ class Screen(QtGui.QMainWindow):
             self.initReconstitutedDataScreen()
 
         elif(event['msg'] == 'reset'):
-            self.data = EMPTY_DATA
+            #EMPTY_DATA
+            self.data = { 
+                "RSD_series_nbr": None,
+                "RSD_test_nbr": None,
+                "CSD_series_nbr": None,
+                "CSD_test_nbr": None,
+                "RD_full":None,
+                "CD_full":None,
+            }
             for btn in self.toolBarBtns[1:]:
                 btn.setStyleSheet(Style.TOOLBAR_BTN_DISABLED)
                 btn.setEnabled(False)
@@ -162,7 +194,7 @@ class Screen(QtGui.QMainWindow):
             self.initEmptyDataMsg()
 
         elif(event['msg'] == 'unchanged'):
-            self.initControldDataScreen()
+            self.initLinearVerificationScreen()
 
     def updateToolBarBtnsStyle(self, idxOn):
         for btn in self.toolBarBtns:

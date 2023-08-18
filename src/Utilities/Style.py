@@ -71,3 +71,93 @@ RESET_BUTTON = """
         background-color: rgb(255,175,175);
     }
 """
+
+INTERPOLATION_TABLE_STYLES = """
+    QLabel.tableElement{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 160px;
+        min-width: 160px;
+        font-weight: 400;
+        margin:0;
+        border:none;
+    }
+    QLabel.tableColsHeader{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 220px;
+        min-width: 220px;
+        background-color: rgb(180,230,180);
+        margin:0;
+        border:none;
+    }
+    QLabel.tableColsHeaderSmall{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 170px;
+        min-width: 170px;
+        background-color: rgb(180,230,180);
+        margin:0;
+        border:none;
+    }
+    QLabel.tableColsHeaderLarge{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 270px;
+        min-width: 270px;
+        background-color: rgb(180,230,180);
+        margin:0;
+        border:none;
+    }
+    QLabel.lightTableElement{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 220px;
+        min-width: 220px;
+        margin:0;
+        border:none;
+    }
+    QLabel.lightTableElementSmall{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 170px;
+        min-width: 170px;
+        margin:0;
+        border:none;
+    }
+    QLabel.lightTableElementLarge{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 270px;
+        min-width: 270px;
+        margin:0;
+        border:none;
+    }
+    QLabel.DarkTableElement{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 220px;
+        min-width: 220px;
+        background-color: #e0e0e0;
+        margin:0;
+        border:none;
+    }
+    QLabel.DarkTableElementSmall{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 170px;
+        min-width: 170px;
+        background-color: #e0e0e0;
+        margin:0;
+        border:none;
+    }
+    QLabel.DarkTableElementLarge{
+        font-size: 18px;
+        padding: 12px;
+        max-width: 270px;
+        min-width: 270px;
+        background-color: #e0e0e0;
+        margin:0;
+        border:none;
+    }
+"""

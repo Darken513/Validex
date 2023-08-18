@@ -6,7 +6,7 @@ import mathUtils as math
 #----------------------------- Util functions for couchran test ---------------------------------#
 #------------------------------------------------------------------------------------------------#
 
-COCHRAN_TABLE = {
+__COCHRAN_TABLE = {
     1: {
         2: 0.9985,
         3: 0.9669,
@@ -289,24 +289,24 @@ COCHRAN_TABLE = {
     }
 }
 
-def cochranCV(alpha, df, dfn):
+def cochranCVTable(alpha, df, dfn):
     if(alpha!=0.05):
         return None
-    if(dfn in COCHRAN_TABLE.keys()):
-        if(df in COCHRAN_TABLE[dfn].keys()):
-            return round(COCHRAN_TABLE[dfn][df],2)
+    if(dfn in __COCHRAN_TABLE.keys()):
+        if(df in __COCHRAN_TABLE[dfn].keys()):
+            return round(__COCHRAN_TABLE[dfn][df],2)
         else:
-            x = COCHRAN_TABLE[dfn].keys()
-            y = COCHRAN_TABLE[dfn].values()
+            x = __COCHRAN_TABLE[dfn].keys()
+            y = __COCHRAN_TABLE[dfn].values()
             interp_func =  interp1d(x, y, kind=('quadratic' if df <= 120 else 'slinear'))
             return round(interp_func(df),2)
     else:
-        x = COCHRAN_TABLE.keys()
-        y = [cochranCV(alpha, df, key) for key in x]
+        x = __COCHRAN_TABLE.keys()
+        y = [cochranCVTable(alpha, df, key) for key in x]
         interp_func =  interp1d(x, y, kind=('quadratic' if df <= 120 else 'slinear'))
         return round(interp_func(df),2)
     
-def calculateCouchran(n, S2j):
+def __calculateCouchran(n, S2j):
     maxS2 = max(S2j)
     return round(maxS2/sum(S2j),2)
 
@@ -314,31 +314,15 @@ def calculateCouchran(n, S2j):
 #--------------------------------- Implementing couchran test -----------------------------------#
 #------------------------------------------------------------------------------------------------#
 
-n = 5
-m = 3
-b = 798.528273
-a = -1345.52
-corelation = 0.9998
-
-x = np.array([[0.0]*m]*n)
-y = np.array([[0.0]*m]*n)
-
-xy = [
-    [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
-    [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
-    [[161.8, 128105.0], [161.5, 126865.0], [161.2, 127788.0]], 
-    [[195.5, 155967.0], [195.3, 153848.0], [195.3, 153608.0]], 
-    [[227.8, 181879.0], [228.6, 180355.0], [228.2, 180909.0]]
-]
-
-for j in range(n):
-    for i in range(m):
-        x[j][i] = xy[j][i][0] 
-        y[j][i] = xy[j][i][1] 
-    
-Xbars = math.calculateXbars(n, m, x)
-Yij = math.calculateYij(n, m, b, x, y, Xbars)
-S2j = math.calculateS2j(n, m, Yij)
-calculatedCouchran = calculateCouchran(n, S2j)
-print(calculatedCouchran)
-print(cochranCV(0.05,n,m-1))
+def couchranValue(n, m, b, xy):
+    x = np.array([[0.0]*m]*n)
+    y = np.array([[0.0]*m]*n)
+    for j in range(n):
+        for i in range(m):
+            x[j][i] = xy[j][i][0] 
+            y[j][i] = xy[j][i][1] 
+    Xbars = math.calculateXbars(n, m, x)
+    Yij = math.calculateYij(n, m, b, x, y, Xbars)
+    S2j = math.calculateS2j(n, m, Yij)
+    calculatedCouchran = __calculateCouchran(n, S2j)
+    return calculatedCouchran

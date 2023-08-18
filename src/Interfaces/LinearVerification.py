@@ -3,6 +3,9 @@ import Utilities.Style as Style
 import CustomWidgets.LinearGraph as LG
 import CustomWidgets.InterpretationTable as IT
 from scipy import stats
+import Utilities.CochrantTest as CochrantTest
+import Utilities.StudentTest as StudentTest
+import Utilities.FisherTest as FisherTest
 
 class Screen(QtGui.QWidget):
     def __init__(self, mainScreen):
@@ -35,9 +38,9 @@ class Screen(QtGui.QWidget):
         toolbar.setMovable(False)
         self.layout.addWidget(toolbar)
 
-        button1 = QtGui.QPushButton('D1 Linearity verification', self)
+        button1 = QtGui.QPushButton('Reconstituted data Linearity verification', self)
         button1.clicked.connect(self.initD1Screen)
-        button2 = QtGui.QPushButton('D2 Linearity verification', self)
+        button2 = QtGui.QPushButton('Control data Linearity verification', self)
         button2.clicked.connect(self.initD2Screen)
         button3 = QtGui.QPushButton('Statistics study', self)
 
@@ -58,6 +61,7 @@ class Screen(QtGui.QWidget):
 
     def initUI(self):
         self.scrollAreaWidget = QtGui.QScrollArea()
+        #self.scrollAreaWidget.setStyleSheet("background-color: white;")
         self.contentHolderWidget = QtGui.QWidget()
         self.contentHolderLayout = QtGui.QVBoxLayout()
         self.contentHolderWidget.setLayout(self.contentHolderLayout)
@@ -77,9 +81,9 @@ class Screen(QtGui.QWidget):
     def redrawInner(self):
         titleText = ""
         if(self.currentScreen == 0):
-            titleText = "D1 graph :"
+            titleText = "Reconstituted data graph :"
         elif(self.currentScreen == 1):
-            titleText = "D2 graph :"
+            titleText = "Control data graph :"
         else:
             return #treat it in different method
         
@@ -99,7 +103,6 @@ class Screen(QtGui.QWidget):
         widget = LG.MatplotlibWidget(self.data)
         self.contentHolderLayout.addWidget(widget)
        
-        self.drawEquationDetailsTable()
         self.drawInterpretationTable()
         
         self.setStyleSheet("""
@@ -114,7 +117,8 @@ class Screen(QtGui.QWidget):
                 border:none;
                 color: rgb(60,60,60);
                 font-size:25px;
-                min-width: 210px;
+                font-weight: 500;
+                min-width: 360px;
                 max-width: none;
                 margin-bottom:0;
                 padding-bottom:0;
@@ -140,31 +144,27 @@ class Screen(QtGui.QWidget):
         layout.addStretch()
         self.contentHolderLayout.addWidget(widget)
     
-    def drawEquationDetailsTable(self):
-        equation = str(round(self.data["intercept"], 3))+" + "+str(round(self.data["slope"], 3))+" . X"
-        widget = IT.InterpretationTable(
-            [
-                "The equation",
-                "Slope",
-                "Intercept",
-                'Correlation coefficient'
-            ],
-            [], #no rows
-            [
-                [equation],
-                [str(round(self.data["slope"], 6))],
-                [str(round(self.data["intercept"], 6))],
-                [str(round(self.data["r_value"], 6))]
-            ]
-        )
-        self.contentHolderLayout.addWidget(widget)
-        
     def drawInterpretationTable(self):
+        print("currentScreen", self.currentScreen)
+        n = self.mainScreen.data["RSD_series_nbr" if self.currentScreen == 0 else "CSD_series_nbr"]
+        m = self.mainScreen.data["RSD_test_nbr" if self.currentScreen == 0 else "CSD_test_nbr"]
+        b = self.data["slope"]
+        xy = self.mainScreen.data["RD_full" if self.currentScreen == 0 else "CD_full"]
+        
+        CT = CochrantTest.couchranValue(n, m, b, xy)
+        C_CV = CochrantTest.cochranCVTable(0.05, n, m-1)
+        
+        FHS = FisherTest.calculateFisherHS(n, m, b, xy)
+        FHS_CV = FisherTest.fisherCVTable(0.05, 1, n*m-2)
+        
+        FNS = FisherTest.calculateFisherNS(n, m, b, xy)
+        FNS_CV = FisherTest.fisherCVTable(0.05, n-2, n*m-n)
+        
         widget = IT.InterpretationTable(
             [
                 'Homogenity of variances test',
                 'Slope existence test',
-                'validity of adjustments'
+                'Validity of adjustments'
             ],
             [
                 'Calculated value',
@@ -172,10 +172,11 @@ class Screen(QtGui.QWidget):
                 'Interpretation'
             ],
             [
-                [1,2,3],
-                [4,5,6],
-                [6,7,8]
-            ]
+                [ CT , 'C(0.05, {}, {})='.format(str(n), str(m-1)) + str(C_CV) , ('Non Significant' if CT < C_CV else 'Significant') ],
+                [ FHS, 'F(0.05, 1, {})='.format(str(n*m-2)) + str(FHS_CV), ('Non Significant' if FHS < FHS_CV else 'Highly Significant') ],
+                [ FNS, 'F(0.05, {}, {})='.format(str(n-2), str(n*m-n)) + str(FNS_CV), ('Non Significant' if FNS < FNS_CV else 'Significant') ]
+            ],
+            [ 'large', 'small', 'inherit', 'inherit' ]
         )
         self.contentHolderLayout.addWidget(widget)
         
@@ -198,6 +199,8 @@ class Screen(QtGui.QWidget):
         if(std_err):
             print(std_err, "an error has occured")       
 
+        self.currentScreen = 0
+
     def calculateD2Details(self):
         self.updateToolBarBtnsStyle(1)
         
@@ -216,6 +219,8 @@ class Screen(QtGui.QWidget):
 
         if(std_err):
             print(std_err, "an error has occured")
+        
+        self.currentScreen = 1
 
     def updateToolBarBtnsStyle(self, idxOn):
         for btn in self.toolBarBtns:

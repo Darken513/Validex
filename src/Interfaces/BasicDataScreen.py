@@ -56,7 +56,7 @@ class Screen(QtGui.QWidget):
         label = QtGui.QLabel(labelText)
         label.setStyleSheet("min-width:200px;")
         inputField = QtGui.QLineEdit()
-        inputField.setPlaceholderText('0')
+        inputField.setPlaceholderText('x >= 2')
         validator = QtGui.QIntValidator(self)
         inputField.setValidator(validator)
         inputField.setAlignment(QtCore.Qt.AlignRight)
@@ -127,6 +127,8 @@ class Screen(QtGui.QWidget):
 
 
     def onSubmit(self):
+        # todo : m should never be less than 2 !!!!!!!!!!!!!! cause we use often in math equations m-1
+        # todo : n should never be less than 3 !!!!!!!!!!!!!! cause we use often in math equations n-2
         self.data["RSD_series_nbr"] = int(self.inputNDS_RSD.text() if len(self.inputNDS_RSD.text())!=0 else '0')
         self.data["RSD_test_nbr"] = int(self.inputMT_RSD.text() if len(self.inputMT_RSD.text())!=0 else '0')
         self.data["CSD_series_nbr"] = int(self.inputNDS_CSD.text() if len(self.inputNDS_CSD.text())!=0 else '0')

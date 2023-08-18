@@ -126,7 +126,7 @@ class DataTable(QtGui.QWidget):
                 textY = str(widget.layout().itemAt(1).widget().text())
                 columnData.append([
                     0 if textX=='' else float(textX), 
-                    0 if textX=='' else float(textY)
+                    0 if textY=='' else float(textY)
                 ])
             fullData.append(columnData)
         return fullData
