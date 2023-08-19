@@ -3,8 +3,8 @@ import Utilities.Style as Style
 import CustomWidgets.LinearGraph as LG
 import CustomWidgets.InterpretationTable as IT
 from scipy import stats
+import Interfaces.StatisticsStudy as StatisticsStudy
 import Utilities.CochrantTest as CochrantTest
-import Utilities.StudentTest as StudentTest
 import Utilities.FisherTest as FisherTest
 
 class Screen(QtGui.QWidget):
@@ -43,6 +43,7 @@ class Screen(QtGui.QWidget):
         button2 = QtGui.QPushButton('Control data Linearity verification', self)
         button2.clicked.connect(self.initD2Screen)
         button3 = QtGui.QPushButton('Statistics study', self)
+        button3.clicked.connect(self.initStatisticsScreen)
 
         toolbar.addWidget(button1)
         toolbar.addWidget(button2)
@@ -66,18 +67,25 @@ class Screen(QtGui.QWidget):
         self.contentHolderLayout = QtGui.QVBoxLayout()
         self.contentHolderWidget.setLayout(self.contentHolderLayout)
         self.layout.addWidget(self.scrollAreaWidget)
+        # for initial calculation, should calculate both, then use them for reference
+        self.calculateD2Details()
         self.calculateD1Details()
         self.redrawInner()
         self.scrollAreaWidget.setWidget(self.contentHolderWidget)
 
     def initD1Screen(self):
-        self.calculateD1Details()
+        self.updateToolBarBtnsStyle(0)
+        self.currentScreen = 0
         self.redrawInner()
 
     def initD2Screen(self):
-        self.calculateD2Details()
+        self.updateToolBarBtnsStyle(1)
+        self.currentScreen = 1
         self.redrawInner()
 
+    def initStatisticsScreen(self):
+        StatisticsStudy.Screen(self)
+        
     def redrawInner(self):
         titleText = ""
         if(self.currentScreen == 0):
@@ -100,7 +108,9 @@ class Screen(QtGui.QWidget):
         title.setProperty('class', 'title')
         self.contentHolderLayout.addWidget(title)
 
-        widget = LG.MatplotlibWidget(self.data)
+        data = self.data['Reconstituted data graph (D1)'] if self.currentScreen==0 else self.data['Control data graph (D2)']
+        
+        widget = LG.MatplotlibWidget(data, False)
         self.contentHolderLayout.addWidget(widget)
        
         self.drawInterpretationTable()
@@ -145,10 +155,10 @@ class Screen(QtGui.QWidget):
         self.contentHolderLayout.addWidget(widget)
     
     def drawInterpretationTable(self):
-        print("currentScreen", self.currentScreen)
+        data = self.data['Reconstituted data graph (D1)'] if self.currentScreen==0 else self.data['Control data graph (D2)']
         n = self.mainScreen.data["RSD_series_nbr" if self.currentScreen == 0 else "CSD_series_nbr"]
         m = self.mainScreen.data["RSD_test_nbr" if self.currentScreen == 0 else "CSD_test_nbr"]
-        b = self.data["slope"]
+        b = data["slope"]
         xy = self.mainScreen.data["RD_full" if self.currentScreen == 0 else "CD_full"]
         
         CT = CochrantTest.couchranValue(n, m, b, xy)
@@ -182,45 +192,48 @@ class Screen(QtGui.QWidget):
         
     def calculateD1Details(self):
         self.updateToolBarBtnsStyle(0)
-                
-        self.data["listX"] = []
-        self.data["listY"] = []
+        data = {}      
+        data["listX"] = []
+        data["listY"] = []
         for subarray in self.mainScreen.data["RD_full"]:
             for i in range(len(subarray)):
-                self.data["listX"].append(subarray[i][0])
-                self.data["listY"].append(subarray[i][1])
+                data["listX"].append(subarray[i][0])
+                data["listY"].append(subarray[i][1])
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(self.data["listX"], self.data["listY"])
+        slope, intercept, r_value, p_value, std_err = stats.linregress(data["listX"], data["listY"])
 
-        self.data["slope"] = slope
-        self.data["intercept"] = intercept
-        self.data["r_value"] = r_value
+        data["slope"] = slope
+        data["intercept"] = intercept
+        data["r_value"] = r_value
 
+        self.data['Reconstituted data graph (D1)'] = data
+        
         if(std_err):
             print(std_err, "an error has occured")       
 
         self.currentScreen = 0
 
     def calculateD2Details(self):
-        self.updateToolBarBtnsStyle(1)
+        data = {}
         
-        self.data["listX"] = []
-        self.data["listY"] = []
+        data["listX"] = []
+        data["listY"] = []
         for subarray in self.mainScreen.data["CD_full"]:
             for i in range(len(subarray)):
-                self.data["listX"].append(subarray[i][0])
-                self.data["listY"].append(subarray[i][1])
+                data["listX"].append(subarray[i][0])
+                data["listY"].append(subarray[i][1])
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(self.data["listX"], self.data["listY"])
+        slope, intercept, r_value, p_value, std_err = stats.linregress(data["listX"], data["listY"])
 
-        self.data["slope"] = slope
-        self.data["intercept"] = intercept
-        self.data["r_value"] = r_value
+        data["slope"] = slope
+        data["intercept"] = intercept
+        data["r_value"] = r_value
+        
+        self.data['Control data graph (D2)'] = data
 
         if(std_err):
             print(std_err, "an error has occured")
         
-        self.currentScreen = 1
 
     def updateToolBarBtnsStyle(self, idxOn):
         for btn in self.toolBarBtns:

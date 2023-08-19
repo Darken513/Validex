@@ -323,7 +323,3 @@ gives 0.2599 as opposed to 0.2461 for the linear case. This formula can be
 generalised by adapting Bernie's formula above (using offset(...-2,0,4,1) and
 ^{1,2,3}).
 """ 
-
-""" print(fisherCV(0.05,1,13))
-print(fisherCV(0.05,3,10))
-print(tStudentCV(0.05,26)) """

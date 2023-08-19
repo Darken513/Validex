@@ -4,8 +4,14 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
 
 class MatplotlibWidget(QtGui.QWidget):
-    def __init__(self, dataDict):
+    def __init__(self, dataDict, isMultiChart):
         super(MatplotlibWidget, self).__init__()
+        if(not isMultiChart):
+            self.drawSingleChart(dataDict)
+        else:
+            self.drawMultiChart(dataDict, isMultiChart)
+            
+    def drawSingleChart(self, dataDict):
         # to do : make it responsive 
         self.listX = dataDict["listX"]
         self.listY = dataDict["listY"]
@@ -44,6 +50,37 @@ class MatplotlibWidget(QtGui.QWidget):
         # plot the line we think its best
         self.axes.plot(regression_x, regression_y)
 
+        # Create a FigureCanvas widget
+        self.canvas = FigureCanvas(self.figure)
+
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(self.canvas)
+        
+    def drawMultiChart(self, dataDict, isMultiChart):
+        # Create a Matplotlib figure and axes
+        self.figure = plt.figure()
+        self.axes = self.figure.add_subplot(111)
+        self.axes.set_xlabel('X-axis')
+        self.axes.set_ylabel('Y-axis')
+        self.axes.set_title('Matplotlib Graph')
+
+        for i in range(len(isMultiChart)):
+            dataKey = isMultiChart[i]
+            print(dataDict)
+            listX = dataDict[dataKey]["listX"]
+            slope = dataDict[dataKey]["slope"]
+            intercept = dataDict[dataKey]["intercept"]
+
+            gap = max(listX) - min(listX)
+            lowX = min(listX) - gap/10
+            highX = max(listX) + gap/10
+            regression_x = np.linspace(0 if lowX<0 else lowX, highX, 100)
+            regression_y = [ intercept + slope*number for number in regression_x ]
+
+            # plot the line we think its best
+            self.axes.plot(regression_x, regression_y, label=dataKey)
+        
+        self.axes.legend()
         # Create a FigureCanvas widget
         self.canvas = FigureCanvas(self.figure)
 
