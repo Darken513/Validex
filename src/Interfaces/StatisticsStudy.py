@@ -52,7 +52,7 @@ class Screen(QtGui.QWidget):
         widget = IT.InterpretationTable(
             [
                 'Intercept comparison test',
-                'Comparison test of slopes of fitting lines',
+                ['Comparison test of', 'slopes of fitting lines'],
                 'Intercept comparison test with 0'
             ],
             [
@@ -61,9 +61,9 @@ class Screen(QtGui.QWidget):
                 'Interpretation'
             ],
             [
-                [ CT , 'C(0.05, {}, {})='.format(str(n), str(m-1)) + str(C_CV) , ('Non Significant' if CT < C_CV else 'Significant') ],
-                [ FHS, 'F(0.05, 1, {})='.format(str(n*m-2)) + str(FHS_CV), ('Non Significant' if FHS < FHS_CV else 'Highly Significant') ],
-                [ FNS, 'F(0.05, {}, {})='.format(str(n-2), str(n*m-n)) + str(FNS_CV), ('Non Significant' if FNS < FNS_CV else 'Significant') ]
+                [ [[['header1', 'value1'], ['header2', 'value2']], 'minitable'], 'C(0.05, {}, {})='.format(str(n), str(m-1)) + str(C_CV) , ('Non Significant' if CT < C_CV else 'Significant') ],
+                [ [['header1', 'value1', 'header2', 'value2'], 'multilines'], 'F(0.05, 1, {})='.format(str(n*m-2)) + str(FHS_CV), ('Non Significant' if FHS < FHS_CV else 'Highly Significant') ],
+                [ FNS, 'F(0.05, {}, {})='.format(str(n-2), str(n*m-n)) + str(FNS_CV), [[['header1', 'value1'], ['header2', 'value2']], 'minitable']]
             ],
             [ 'large', 'small', 'inherit', 'inherit' ]
         )

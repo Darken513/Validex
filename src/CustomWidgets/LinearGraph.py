@@ -66,7 +66,6 @@ class MatplotlibWidget(QtGui.QWidget):
 
         for i in range(len(isMultiChart)):
             dataKey = isMultiChart[i]
-            print(dataDict)
             listX = dataDict[dataKey]["listX"]
             slope = dataDict[dataKey]["slope"]
             intercept = dataDict[dataKey]["intercept"]
