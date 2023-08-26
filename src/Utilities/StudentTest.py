@@ -10,7 +10,7 @@ def tStudentCV(alpha, df):
     critical_value = t.ppf(1 - alpha/2, df)
     return round(critical_value,3)
 
-def calculate_variance(data):
+def __calculate_variance(data):
     n = len(data)
     if n == 0:
         raise ValueError("Array must not be empty")
@@ -19,15 +19,31 @@ def calculate_variance(data):
     variance = sum(squared_diff) / n
     return variance
 
-def slope_variance(x, Xbars, Yij_flatten):
-    VarYij = calculate_variance(Yij_flatten)
+def __slope_variance(x, Xbars, Yij_flatten):
+    VarYij = __calculate_variance(Yij_flatten)
     dev = 0
     for i in range(len(x)):
         for j in range(len(x[i])):
             dev += (x[i][j] - Xbars[i])**2
     return VarYij / dev
 
-def calculate_TestT_pente(b1, b2, r1, r2, x1, x2, y1, y2):
+def calculate_TestT_pente(b1, b2, r1, r2, xy1, xy2):
+    
+    x1 = np.array([[0.0]*m]*n)
+    y1 = np.array([[0.0]*m]*n)
+    x2 = np.array([[0.0]*m]*n)
+    y2 = np.array([[0.0]*m]*n)
+    
+    for j in range(n):
+        for i in range(m):
+            x1[j][i] = xy1[j][i][0] 
+            y1[j][i] = xy1[j][i][1] 
+            
+    for j in range(n):
+        for i in range(m):
+            x2[j][i] = xy2[j][i][0] 
+            y2[j][i] = xy2[j][i][1] 
+
     n1 = len(x1)*len(x1[0])
     SCE1X = math.calculateSCEXFlat(n1, x1)
     
@@ -42,9 +58,25 @@ def calculate_TestT_pente(b1, b2, r1, r2, x1, x2, y1, y2):
     
     S2C = math.calculateS2C(n1, n2, SCE1r, SCE2r)
     
-    return abs(b1-b2)/pyMath.sqrt(S2C* (1/SCE1X + 1/SCE2X))
+    return round(abs(b1-b2)/pyMath.sqrt(S2C* (1/SCE1X + 1/SCE2X)), 2)
 
-def calculate_TestT_ord(a1, a2, r1, r2, x1, x2, y1, y2):
+def calculate_TestT_ord(a1, a2, r1, r2, xy1, xy2):
+    
+    x1 = np.array([[0.0]*m]*n)
+    y1 = np.array([[0.0]*m]*n)
+    x2 = np.array([[0.0]*m]*n)
+    y2 = np.array([[0.0]*m]*n)
+    
+    for j in range(n):
+        for i in range(m):
+            x1[j][i] = xy1[j][i][0] 
+            y1[j][i] = xy1[j][i][1] 
+            
+    for j in range(n):
+        for i in range(m):
+            x2[j][i] = xy2[j][i][0] 
+            y2[j][i] = xy2[j][i][1] 
+            
     n1 = len(x1)*len(x1[0])
     x1mean = sum(x1.flatten())/len(x1.flatten())
     SCE1X = math.calculateSCEXFlat(n1, x1)
@@ -61,32 +93,44 @@ def calculate_TestT_ord(a1, a2, r1, r2, x1, x2, y1, y2):
     
     S2C = math.calculateS2C(n1, n2, SCE1r, SCE2r)
     
-    return abs(a1-a2)/pyMath.sqrt(S2C* (1/n1 + x1mean**2/SCE1X + 1/n2 + x2mean**2/SCE2X))
+    return round(abs(a1-a2)/pyMath.sqrt(S2C* (1/n1 + x1mean**2/SCE1X + 1/n2 + x2mean**2/SCE2X)), 2)
 
-def calculate_TestT_ord0(a1, r1, x1, y1):
-    n1 = len(x1)*len(x1[0])
-    x1mean = sum(x1.flatten())/len(x1.flatten())
+def calculate_TestT_ord0(a, r, xy):
+    n = len(xy)
+    m = len(xy[0])
     
-    SCE1X = math.calculateSCEXFlat(n1, x1)
-    SCE1Y = math.calculateSCEYFlat(n1, y1)
-    SCE1r = math.calculateSCER(r1, SCE1Y)
+    x = np.array([[0.0]*m]*n)
+    y = np.array([[0.0]*m]*n)
     
-    S2C = SCE1r / (n1 - 2)
+    for j in range(n):
+        for i in range(m):
+            x[j][i] = xy[j][i][0] 
+            y[j][i] = xy[j][i][1] 
+            
+    N = len(x)*len(x[0])
     
-    return abs(a1)/pyMath.sqrt(S2C* (1/n1 + x1mean**2/SCE1X))
+    xmean = sum(x.flatten())/len(x.flatten())
+    
+    SCEX = math.calculateSCEXFlat(N, x)
+    SCEY = math.calculateSCEYFlat(N, y)
+    SCEr = math.calculateSCER(r, SCEY)
+    
+    S2C = SCEr / (N - 2)
+    
+    return round(abs(a)/pyMath.sqrt(S2C* (1/n + xmean**2/SCEX)), 2)
 
 
-def calculate_TestTold(n, m, b1, b2, x1, y1, x2, y2):
+def __calculate_TestTold(n, m, b1, b2, x1, y1, x2, y2):
     Xbars1 = math.calculateXbars(n, m, x1)
     Yij1_flatten = math.calculateYij(n, m, b1, x1, y1, Xbars1).flatten()
 
     Xbars2 = math.calculateXbars(n, m, x2)
     Yij2_flatten = math.calculateYij(n, m, b2, x2, y2, Xbars2).flatten()
 
-    Vslope1 = slope_variance(x1, Xbars1, Yij1_flatten)
-    Vslope2 = slope_variance(x2, Xbars2, Yij2_flatten)
+    Vslope1 = __slope_variance(x1, Xbars1, Yij1_flatten)
+    Vslope2 = __slope_variance(x2, Xbars2, Yij2_flatten)
     
-    return abs(b1 - b2)/pyMath.sqrt(Vslope1+Vslope2)
+    return round(abs(b1 - b2)/pyMath.sqrt(Vslope1+Vslope2), 2)
 #------------------------------------------------------------------------------------------------#
 #---------------------------------- Implementing Student test -----------------------------------#
 #------------------------------------------------------------------------------------------------#
@@ -99,11 +143,6 @@ corelation1 = 0.9998
 b2 = 791.593
 a2 = -1113.5
 corelation2 = 0.9998
-
-x1 = np.array([[0.0]*m]*n)
-y1 = np.array([[0.0]*m]*n)
-x2 = np.array([[0.0]*m]*n)
-y2 = np.array([[0.0]*m]*n)
 
 xy1 = [
     [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
@@ -120,29 +159,10 @@ xy2 = [
     [[194.1, 153035.0], [194.1, 151598.0], [194.5, 153867.0]], 
     [[226.4, 178584.0], [225.6, 176002.0], [225.9, 178332.0]]
 ]
-
-for j in range(n):
-    for i in range(m):
-        x1[j][i] = xy1[j][i][0] 
-        y1[j][i] = xy1[j][i][1] 
-        
-for j in range(n):
-    for i in range(m):
-        x2[j][i] = xy2[j][i][0] 
-        y2[j][i] = xy2[j][i][1] 
        
-Xbars1 = math.calculateXbars(n, m, x1)
-Yij1_flatten = math.calculateYij(n, m, b1, x1, y1, Xbars1).flatten()
-
-Xbars2 = math.calculateXbars(n, m, x2)
-Yij2_flatten = math.calculateYij(n, m, b2, x2, y2, Xbars2).flatten()
-
-Vslope1 = slope_variance(x1, Xbars1, Yij1_flatten)
-Vslope2 = slope_variance(x2, Xbars2, Yij2_flatten)
-
-""" T_pente = calculate_TestT_pente(b1, b2, corelation1, corelation2, x1, x2, y1, y2)
-print(T_pente)
-T_ord = calculate_TestT_ord(a1, a2, corelation1, corelation2, x1, x2, y1, y2)
-print(T_ord)
-
-print(calculate_TestT_ord0(a2, corelation2, x2, y2)) """
+T_pente = calculate_TestT_pente(b1, b2, corelation1, corelation2, xy1, xy2) # (9)
+print(T_pente) 
+T_ord = calculate_TestT_ord(a1, a2, corelation1, corelation2, xy1, xy2) # (8)
+print(T_ord) 
+T_ord0 = calculate_TestT_ord0(a1, corelation1, xy1) # (4)
+print(T_ord0) 

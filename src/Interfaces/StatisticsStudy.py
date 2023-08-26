@@ -6,6 +6,7 @@ import CustomWidgets.InterpretationTable as IT
 import Utilities.CochrantTest as CochrantTest
 import Utilities.StudentTest as StudentTest
 import Utilities.FisherTest as FisherTest
+
 class Screen(QtGui.QWidget):
     def __init__(self, callerScreen):
         super(Screen, self).__init__()
@@ -31,29 +32,46 @@ class Screen(QtGui.QWidget):
         
         widget = LG.MatplotlibWidget(self.callerScreen.data, ['Reconstituted data graph (D1)', 'Control data graph (D2)'])
         self.callerScreen.contentHolderLayout.addWidget(widget)
-        self.drawInterpretationTable()
+        self.drawInterpretationTableAndMsg()
     
-    def drawInterpretationTable(self):
-        data = self.callerScreen.data['Reconstituted data graph (D1)'] if self.callerScreen.currentScreen==0 else self.callerScreen.data['Control data graph (D2)']
-        n = self.callerScreen.mainScreen.data["RSD_series_nbr" if self.callerScreen.currentScreen == 0 else "CSD_series_nbr"]
-        m = self.callerScreen.mainScreen.data["RSD_test_nbr" if self.callerScreen.currentScreen == 0 else "CSD_test_nbr"]
-        b = data["slope"]
-        xy = self.callerScreen.mainScreen.data["RD_full" if self.callerScreen.currentScreen == 0 else "CD_full"]
+    def drawInterpretationTableAndMsg(self):
+        data1 = self.callerScreen.data['Reconstituted data graph (D1)'] 
+        data2 = self.callerScreen.data['Control data graph (D2)']
         
-        CT = CochrantTest.couchranValue(n, m, b, xy)
-        C_CV = CochrantTest.cochranCVTable(0.05, n, m-1)
+        n1 = self.callerScreen.mainScreen.data["RSD_series_nbr"]
+        m1 = self.callerScreen.mainScreen.data["RSD_test_nbr"]
         
-        FHS = FisherTest.calculateFisherHS(n, m, b, xy)
-        FHS_CV = FisherTest.fisherCVTable(0.05, 1, n*m-2)
+        n2 = self.callerScreen.mainScreen.data["CSD_series_nbr"]
+        m2 = self.callerScreen.mainScreen.data["CSD_test_nbr"]
         
-        FNS = FisherTest.calculateFisherNS(n, m, b, xy)
-        FNS_CV = FisherTest.fisherCVTable(0.05, n-2, n*m-n)
+        a1 = data1["intercept"]
+        a2 = data2["intercept"]
+        
+        b1 = data1["slope"]
+        b2 = data2["slope"]
+        
+        r1 = data1["r_value"]
+        r2 = data2["r_value"]
+        
+        xy1 = self.callerScreen.mainScreen.data["RD_full"]
+        xy2 = self.callerScreen.mainScreen.data["CD_full"]
+        
+        ICT_8 = StudentTest.calculate_TestT_ord(a1, a2, r1, r2, xy1, xy2)
+        ICT_98_CV = StudentTest.tStudentCV(0.05, (n1*m1 - 2)*2)
+        
+        error1 = (ICT_8 > ICT_98_CV)
+        CTSF_9 = "..." if error1 else StudentTest.calculate_TestT_pente(b1, b2, r1, r2, xy1, xy2)
+        
+        error2 = error1 or (CTSF_9 > ICT_98_CV)
+        ICT0_1 = "..." if error2 else StudentTest.calculate_TestT_ord0(a1, r1, xy1)
+        ICT0_2 = "..." if error2 else StudentTest.calculate_TestT_ord0(a2, r2, xy2)
+        ICT0_CV = "..." if error2 else StudentTest.tStudentCV(0.05, n1*m1 - 2)
         
         widget = IT.InterpretationTable(
             [
                 'Intercept comparison test',
                 ['Comparison test of', 'slopes of fitting lines'],
-                'Intercept comparison test with 0'
+                ['Intercept comparison', 'test with 0']
             ],
             [
                 'Calculated value',
@@ -61,10 +79,59 @@ class Screen(QtGui.QWidget):
                 'Interpretation'
             ],
             [
-                [ [[['header1', 'value1'], ['header2', 'value2']], 'minitable'], 'C(0.05, {}, {})='.format(str(n), str(m-1)) + str(C_CV) , ('Non Significant' if CT < C_CV else 'Significant') ],
-                [ [['header1', 'value1', 'header2', 'value2'], 'multilines'], 'F(0.05, 1, {})='.format(str(n*m-2)) + str(FHS_CV), ('Non Significant' if FHS < FHS_CV else 'Highly Significant') ],
-                [ FNS, 'F(0.05, {}, {})='.format(str(n-2), str(n*m-n)) + str(FNS_CV), [[['header1', 'value1'], ['header2', 'value2']], 'minitable']]
+                [ 
+                    str(ICT_8),
+                    'C(0.05, {})='.format(str((n1*m1 -2)*2)) + str(ICT_98_CV),
+                    ('Non Significant' if ICT_8 < ICT_98_CV else 'Significant')
+                ],
+                [ 
+                    str(CTSF_9),
+                    "..." if error1 else 'C(0.05, {})='.format(str((n1*m1 -2)*2)) + str(ICT_98_CV),
+                    "..." if error1 else ('Non Significant' if CTSF_9 < ICT_98_CV else 'Significant')
+                ],
+                [ 
+                    [[['D1', "..." if error2 else str(ICT0_1)], ['D2', "..." if error2 else str(ICT0_2)]], 'minitable'], 
+                    "..." if error2 else 'C(0.05, {})='.format(str(n1*m1 -2)) + str(ICT0_CV), 
+                    [[
+                        ['D1', "..." if error2 else ('Non Significant' if ICT0_1 < ICT0_CV else 'Significant')], 
+                        ['D2', "..." if error2 else ('Non Significant' if ICT0_2 < ICT0_CV else 'Significant')]
+                    ], 'minitable']
+                ]
             ],
-            [ 'large', 'small', 'inherit', 'inherit' ]
+            [ 'inherit', 'small', 'inherit', 'large' ]
         )
         self.callerScreen.contentHolderLayout.addWidget(widget)
+        
+        finalMessage = ""
+        color = ""
+        if(ICT_8 < ICT_98_CV and CTSF_9 < ICT_98_CV and ICT0_1 < ICT0_CV and ICT0_2 < ICT0_CV):
+            finalMessage = "Reference system : 100% standard"
+            color = " rgb(75,230,75)"
+        elif(ICT_8 < ICT_98_CV and CTSF_9 < ICT_98_CV and not (ICT0_1 < ICT0_CV and ICT0_2 < ICT0_CV)):
+            finalMessage = "Reference system : Calibration range"
+            color = " rgb(75,255,75)"
+        elif(ICT_8 > ICT_98_CV):
+            finalMessage = "Matrix effect, review procedure"
+            color = "red"
+        elif(ICT_8 < ICT_98_CV and CTSF_9 > ICT_98_CV):
+            finalMessage = "Systematic error, possible correction"
+            color = "red"
+        else:
+            finalMessage = "Systematic error, review the provided data"
+            color = "red"
+                        
+        label = QtGui.QLabel(finalMessage)
+        label.setStyleSheet("""
+            color: {0};
+            border: 2px solid {0};
+            font-size: 25px;
+            min-width: 450px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        """.format(color))
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        
+        self.callerScreen.contentHolderLayout.addWidget(label)
+        self.callerScreen.contentHolderLayout.setAlignment(label, QtCore.Qt.AlignCenter) 
+        

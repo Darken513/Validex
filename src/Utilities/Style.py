@@ -127,8 +127,8 @@ INTERPOLATION_TABLE_STYLES = """
         border:none;
         margin:0;
         padding: 10px 5px;
-        max-width: 120px;
-        min-width: 120px;
+        max-width: 130px;
+        min-width: 130px;
     }
     QWidget.tableColsHeaderLarge QLabel,
     QWidget.lightTableElementLarge QLabel,

@@ -24,7 +24,7 @@ class MatplotlibWidget(QtGui.QWidget):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel('X-axis')
         self.axes.set_ylabel('Y-axis')
-        self.axes.set_title('Matplotlib Graph')
+        #self.axes.set_title('Matplotlib Graph')
         
         # plot the entered points by the user
         self.axes.plot(self.listX, self.listY, marker='o', linestyle='', color='red')
@@ -62,7 +62,7 @@ class MatplotlibWidget(QtGui.QWidget):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel('X-axis')
         self.axes.set_ylabel('Y-axis')
-        self.axes.set_title('Matplotlib Graph')
+        #self.axes.set_title('Matplotlib Graph')
 
         for i in range(len(isMultiChart)):
             dataKey = isMultiChart[i]
