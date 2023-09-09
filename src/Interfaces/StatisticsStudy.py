@@ -125,7 +125,7 @@ class Screen(QtGui.QWidget):
             color: {0};
             border: 2px solid {0};
             font-size: 25px;
-            min-width: 450px;
+            min-width: 550px;
             padding: 10px 12px;
             border-radius: 6px;
             margin-top: 15px;
@@ -135,3 +135,5 @@ class Screen(QtGui.QWidget):
         self.callerScreen.contentHolderLayout.addWidget(label)
         self.callerScreen.contentHolderLayout.setAlignment(label, QtCore.Qt.AlignCenter) 
         
+    def generateInterpretationData():
+        pass

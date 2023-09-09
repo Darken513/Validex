@@ -19,7 +19,7 @@ class Screen(QtGui.QWidget):
         self.updateMainScreenUI()
 
     def updateMainScreenUI(self):
-        self.mainScreen.updateToolBarBtnsStyle(3)
+        self.mainScreen.updateToolBarBtnsStyle(3, 4)
         #delete right side
         item = self.mainScreen.layout.takeAt(1)
         widget = item.widget()
@@ -93,7 +93,7 @@ class Screen(QtGui.QWidget):
         elif(self.currentScreen == 1):
             titleText = "Control data graph :"
         else:
-            return #treat it in different method
+            return #treated it in different method
         
         # Delete all widgets under the layout
         while self.contentHolderLayout.count():
@@ -141,19 +141,6 @@ class Screen(QtGui.QWidget):
             }
         """)
 
-    def addLabelValueGroup(self, label, value):
-        widget = QtGui.QWidget()
-        layout = QtGui.QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(layout)
-        labelHolder = QtGui.QLabel(label)
-        labelHolder.setProperty('class', 'labelHolder')
-        valueHolder = QtGui.QLabel(value)
-        layout.addWidget(labelHolder)
-        layout.addWidget(valueHolder)
-        layout.addStretch()
-        self.contentHolderLayout.addWidget(widget)
-    
     def drawInterpretationTable(self):
         data = self.data['Reconstituted data graph (D1)'] if self.currentScreen==0 else self.data['Control data graph (D2)']
         n = self.mainScreen.data["RSD_series_nbr" if self.currentScreen == 0 else "CSD_series_nbr"]

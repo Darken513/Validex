@@ -28,6 +28,8 @@ def __slope_variance(x, Xbars, Yij_flatten):
     return VarYij / dev
 
 def calculate_TestT_pente(b1, b2, r1, r2, xy1, xy2):
+    n = len(xy1)
+    m = len(xy1[0])
     
     x1 = np.array([[0.0]*m]*n)
     y1 = np.array([[0.0]*m]*n)
@@ -61,6 +63,8 @@ def calculate_TestT_pente(b1, b2, r1, r2, xy1, xy2):
     return round(abs(b1-b2)/pyMath.sqrt(S2C* (1/SCE1X + 1/SCE2X)), 2)
 
 def calculate_TestT_ord(a1, a2, r1, r2, xy1, xy2):
+    n = len(xy1)
+    m = len(xy1[0])
     
     x1 = np.array([[0.0]*m]*n)
     y1 = np.array([[0.0]*m]*n)
@@ -131,38 +135,3 @@ def __calculate_TestTold(n, m, b1, b2, x1, y1, x2, y2):
     Vslope2 = __slope_variance(x2, Xbars2, Yij2_flatten)
     
     return round(abs(b1 - b2)/pyMath.sqrt(Vslope1+Vslope2), 2)
-#------------------------------------------------------------------------------------------------#
-#---------------------------------- Implementing Student test -----------------------------------#
-#------------------------------------------------------------------------------------------------#
-
-n = 5
-m = 3
-b1 = 798.528273
-a1 = -1345.52
-corelation1 = 0.9998
-b2 = 791.593
-a2 = -1113.5
-corelation2 = 0.9998
-
-xy1 = [
-    [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
-    [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
-    [[161.8, 128105.0], [161.5, 126865.0], [161.2, 127788.0]], 
-    [[195.5, 155967.0], [195.3, 153848.0], [195.3, 153608.0]], 
-    [[227.8, 181879.0], [228.6, 180355.0], [228.2, 180909.0]]
-]
-
-xy2 = [
-    [[97.2, 76521.0], [97.0, 75251.0], [96.8, 75297.0]], 
-    [[130.5, 102749.0], [131.2, 102210.0], [131.0, 102283.0]], 
-    [[161.1, 126779.0], [163.0, 127242.0], [161.2, 126801.0]], 
-    [[194.1, 153035.0], [194.1, 151598.0], [194.5, 153867.0]], 
-    [[226.4, 178584.0], [225.6, 176002.0], [225.9, 178332.0]]
-]
-       
-T_pente = calculate_TestT_pente(b1, b2, corelation1, corelation2, xy1, xy2) # (9)
-print(T_pente) 
-T_ord = calculate_TestT_ord(a1, a2, corelation1, corelation2, xy1, xy2) # (8)
-print(T_ord) 
-T_ord0 = calculate_TestT_ord0(a1, corelation1, xy1) # (4)
-print(T_ord0) 

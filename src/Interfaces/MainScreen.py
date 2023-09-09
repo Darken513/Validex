@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 import BasicDataScreen
+import AccuracyVerification
 import ReconstitutedDataScreen
 import ControlDataScreen
 import LinearVerification
@@ -10,6 +11,7 @@ EMPTY_DATA = {
     "RSD_test_nbr": 3,
     "CSD_series_nbr": 5,
     "CSD_test_nbr": 3,
+    "Refrence_idx": 3,
     "RD_full":[
         [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
         [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
@@ -34,6 +36,7 @@ class Screen(QtGui.QMainWindow):
             "RSD_test_nbr": 3,
             "CSD_series_nbr": 5,
             "CSD_test_nbr": 3,
+            "Refrence_idx": 3,
             "RD_full":[
                 [[96.5, 76626.0], [96.8, 75154.0], [96.7, 76049.0]], 
                 [[130.0, 103197.0], [129.8, 101786.0], [129.7, 101858.0]], 
@@ -69,6 +72,7 @@ class Screen(QtGui.QMainWindow):
         button4 = QtGui.QPushButton('Linearity', self)
         button4.clicked.connect(self.initLinearVerificationScreen)
         button5 = QtGui.QPushButton('Accuracy', self)
+        button5.clicked.connect(self.initAccuracyVerificationScreen)
         button6 = QtGui.QPushButton('Reliability', self)
 
         toolbar.addWidget(button1)
@@ -124,6 +128,9 @@ class Screen(QtGui.QMainWindow):
 
     def initLinearVerificationScreen(self):
         LinearVerification.Screen(self)
+        
+    def initAccuracyVerificationScreen(self):
+        AccuracyVerification.Screen(self)
 
     def initEmptyDataMsg(self):
         if(
@@ -136,7 +143,20 @@ class Screen(QtGui.QMainWindow):
         ):
             label = QtGui.QLabel("No data to use")
             label.setStyleSheet("padding:100%; font-size:24px; color:rgb(180,180,180);")
+            
+            item = self.layout.takeAt(1)
+            widget = item.widget()
+            self.layout.removeWidget(widget)
+            widget.setParent(None)
+            widget.deleteLater()
+            #draw new widget on the right side
+            self.rightWindow = QtGui.QScrollArea()
+            self.rightWindow.setMinimumSize(200,300)
+            self.layout.addWidget(self.rightWindow)
             self.rightWindow.setWidget(label)
+            for btn in self.toolBarBtns[3:]:
+                btn.setStyleSheet(Style.TOOLBAR_BTN_DISABLED)
+                btn.setEnabled(False)
 
     def onBasicDataScreenEvent(self, event):
         if(event['msg'] == 'submit' and event['data']):
@@ -144,6 +164,7 @@ class Screen(QtGui.QMainWindow):
             self.data["RSD_test_nbr"] = event["data"]["RSD_test_nbr"]
             self.data["CSD_series_nbr"] = event["data"]["CSD_series_nbr"]
             self.data["CSD_test_nbr"] = event["data"]["CSD_test_nbr"]
+            self.data["Refrence_idx"] = event["data"]["Refrence_idx"]
             for btn in self.toolBarBtns[1:3]:
                 btn.setStyleSheet(Style.TOOLBAR_BTN_OFF)
                 btn.setCursor(QtCore.Qt.PointingHandCursor)
@@ -157,6 +178,7 @@ class Screen(QtGui.QMainWindow):
                 "RSD_test_nbr": None,
                 "CSD_series_nbr": None,
                 "CSD_test_nbr": None,
+                "Refrence_idx": None,
                 "RD_full":None,
                 "CD_full":None,
             }
@@ -196,8 +218,11 @@ class Screen(QtGui.QMainWindow):
         elif(event['msg'] == 'unchanged'):
             self.initLinearVerificationScreen()
 
-    def updateToolBarBtnsStyle(self, idxOn):
-        for btn in self.toolBarBtns:
+    def updateToolBarBtnsStyle(self, idxOn, activateTillIdx=0):
+        for i in range(len(self.toolBarBtns)):
+            btn = self.toolBarBtns[i]
+            if(i<=activateTillIdx):
+                btn.setEnabled(True)
             if(btn == self.toolBarBtns[idxOn]):
                 btn.setEnabled(True)
                 btn.setCursor(QtCore.Qt.PointingHandCursor)
@@ -205,5 +230,6 @@ class Screen(QtGui.QMainWindow):
             else:
                 if(btn.isEnabled()):
                     btn.setStyleSheet(Style.TOOLBAR_BTN_OFF)
+                    btn.setCursor(QtCore.Qt.PointingHandCursor)
                 else:
                     btn.setStyleSheet(Style.TOOLBAR_BTN_DISABLED)
