@@ -20,6 +20,7 @@ class InterpretationTable(QtGui.QWidget):
                         
         colsStyle : list of keywords ( should be of size cols nbr )
             keywords could be one of the following : 
+                - 'mini' : it means that the entire col will be lowest widnes 
                 - 'small' : it means that the entire col will be low widnes 
                 - 'inherit' : it means that the entire col will be of normal widnes 
                 - 'large' : it means that the entire col will be of large widnes 
@@ -70,7 +71,6 @@ class InterpretationTable(QtGui.QWidget):
         widget.layout.setSpacing(0)
         widget.setLayout(widget.layout)
         widget.setProperty('class', self.getColElementStyle(col, not row%2))
-        
         data = self.rowsLabels[row-1] if col==0 else self.data[row-1][col-1]
         if isinstance(data, str) or isinstance(data, float) or isinstance(data, int) :
             label = QtGui.QLabel(str(data))
@@ -128,6 +128,8 @@ class InterpretationTable(QtGui.QWidget):
             return 'tableColsHeader'  
         if(style == 'small'):
             return 'tableColsHeaderSmall'
+        if(style == 'mini'):
+            return 'tableColsHeaderMini'
         if(style == 'large'):
             return 'tableColsHeaderLarge'
         
@@ -137,5 +139,7 @@ class InterpretationTable(QtGui.QWidget):
             return 'DarkTableElement' if isDark else 'lightTableElement'
         if(style == 'small'):
             return 'DarkTableElementSmall' if isDark else 'lightTableElementSmall'
+        if(style == 'mini'):
+            return 'DarkTableElementMini' if isDark else 'lightTableElementMini'
         if(style == 'large'):
             return 'DarkTableElementLarge' if isDark else 'lightTableElementLarge'

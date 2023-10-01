@@ -117,7 +117,7 @@ class Screen(QtGui.QWidget):
         labelsWrapper.layout.addWidget(label2)
         
         self.inputRSI_100 = QtGui.QLineEdit()
-        self.inputRSI_100.setStyleSheet("min-height:30px; min-width:100px; max-width:100px;")
+        self.inputRSI_100.setStyleSheet("min-height:15px; min-width:100px; max-width:100px;")
         self.inputRSI_100.setPlaceholderText('x < n')
         validator = QtGui.QIntValidator(self)
         self.inputRSI_100.setValidator(validator)

@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 import CustomWidgets.InterpretationTable as IT
-import Utilities.FisherTest as FisherTest
+import Utilities.mathUtils as mathUtils
 import Utilities.AccuarcyMath as AccuarcyMath
 
 class Screen(QtGui.QWidget):
@@ -57,9 +57,111 @@ class Screen(QtGui.QWidget):
         title.setProperty('class', 'title')
         self.contentHolderLayout.addWidget(title)
 
+        self.setStyleSheet("""
+            QLabel{
+                font-size: 18px;
+                padding: 12px;
+                max-width: 210px;
+                min-width: 210px;
+                border:1px solid rgb(80,80,80);
+            }
+            QLabel.title{
+                border:none;
+                color: rgb(60,60,60);
+                font-size:25px;
+                font-weight: 500;
+                min-width: 360px;
+                max-width: none;
+                margin-bottom:0;
+                padding-bottom:0;
+            }
+            QLabel.labelHolder{
+                max-width: 210px;
+                min-width: 210px;
+                background-color: #79bbbc;
+                color: black;
+            }
+        """)
+        
         self.drawInterpretationTable()
     
     def drawInterpretationTable(self):
-        days_B_case1 = AccuarcyMath.calculateSlopePerSeries100(self.mainScreen.data["CD_full"], self.mainScreen.data["Refrence_idx"]-1)
-        days_B_A_case2 = AccuarcyMath.calculateSlopePerSeries_CD(self.mainScreen.data["CD_full"])
-        print(days_B_case1)
+        if(self.mainScreen.data['inputState'] == '100% standard'):
+            slopes = self.mainScreen.data['days_B_case1']['slopes']
+            data = self.mainScreen.data['RD_full']
+            n = len(data)
+            m = len(data[0])
+            
+            qi_x = []
+            qi_y = []
+            qr_x = []
+            for i in range(n):
+                tempIx = []
+                tempIy = []
+                tempR = []
+                for j in range(m):
+                    tempIx.append(data[i][j][0])
+                    tempIy.append(data[i][j][1])
+                    tempR.append(round(data[i][j][1] / slopes[j], 2))
+                qi_x.append(tempIx)
+                qi_y.append(tempIy)
+                qr_x.append(tempR)
+                
+            recoveries = []
+            for i in range(n):
+                temp = []
+                for j in range(m):
+                    temp.append(round((qr_x[i][j] / data[i][j][0])*100, 2))
+                recoveries.append(temp)
+            
+            s2j = []
+            for i in range(n):
+                mean_y = sum(recoveries[i]) / m
+                variance = sum((y - mean_y)**2 for y in recoveries[i]) / (m-1)
+                s2j.append(variance)
+                
+            sideLabels = []
+            for i in range(n):
+                temp = []
+                for j in range(m):
+                    temp.append('{0}/{1}'.format(i+1, j+1))
+                sideLabels.append(temp)
+            
+            lines = []
+            for i in range(n):
+                cols = []
+                cols.append(data[i])                    
+                lines.append(cols)
+                
+            tableData = []
+            for i in range(n):
+                line = []
+                line.append([self.intArray_toStrArray(qi_x[i]), 'multilines'])
+                line.append([self.intArray_toStrArray(qi_y[i]), 'multilines'])
+                line.append([self.intArray_toStrArray(qr_x[i]), 'multilines'])
+                line.append([self.intArray_toStrArray(recoveries[i]), 'multilines'])
+                line.append(str(round(s2j[i], 5)))
+                tableData.append(line)
+                
+            widget = IT.InterpretationTable(
+                sideLabels,
+                [
+                    'Quantity <br> introduced Xij',
+                    'Response <br> Yij',
+                    'Quantity <br> recovered',
+                    'Recoveries',
+                    'S2j'
+                ],
+                tableData,
+                [ 'mini','mini', 'mini', 'mini', 'mini', 'mini' ]
+            )
+            self.contentHolderLayout.addWidget(widget)
+        else:
+            slopes = self.mainScreen.data['days_B_A_case2']['slopes']
+            intercepts = self.mainScreen.data['days_B_A_case2']['intercepts']
+            
+    def intArray_toStrArray(self, arr):
+        temp = []
+        for i in range(len(arr)):
+            temp.append(str(arr[i]))
+        return temp

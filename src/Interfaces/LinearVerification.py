@@ -19,7 +19,7 @@ class Screen(QtGui.QWidget):
         self.updateMainScreenUI()
 
     def updateMainScreenUI(self):
-        self.mainScreen.updateToolBarBtnsStyle(3, 4)
+        self.mainScreen.updateToolBarBtnsStyle(3, 4 if self.mainScreen.data['inputState']!='error' else 3)
         #delete right side
         item = self.mainScreen.layout.takeAt(1)
         widget = item.widget()
@@ -196,7 +196,8 @@ class Screen(QtGui.QWidget):
         self.data['Reconstituted data graph (D1)'] = data
         
         if(std_err):
-            print(std_err, "an error has occured")       
+            pass
+            #print(std_err, "an error has occured")       
 
         self.currentScreen = 0
 
@@ -219,7 +220,8 @@ class Screen(QtGui.QWidget):
         self.data['Control data graph (D2)'] = data
 
         if(std_err):
-            print(std_err, "an error has occured")
+            pass
+            #print(std_err, "an error has occured")
         
 
     def updateToolBarBtnsStyle(self, idxOn):

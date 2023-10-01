@@ -98,6 +98,15 @@ INTERPOLATION_TABLE_STYLES = """
         max-width: 180px;
         min-width: 180px;
     }
+    QWidget.tableColsHeaderMini QLabel,
+    QWidget.lightTableElementMini QLabel,
+    QWidget.DarkTableElementMini QLabel{
+        border:none;
+        margin:0;
+        padding: 10px;
+        max-width: 140px;
+        min-width: 140px;
+    }
     QLabel.miniTable_QLabelHeader,
     QLabel.miniTable_QLabelHeader,
     QLabel.miniTable_QLabelHeader{
@@ -115,6 +124,15 @@ INTERPOLATION_TABLE_STYLES = """
     QWidget.tableColsHeaderSmall QLabel.miniTable_QLabel,
     QWidget.lightTableElementSmall QLabel.miniTable_QLabel,
     QWidget.DarkTableElementSmall QLabel.miniTable_QLabel{
+        border:none;
+        margin:0;
+        padding: 10px 5px;
+        max-width: 50px;
+        min-width: 50px;
+    }
+    QWidget.tableColsHeaderMini QLabel.miniTable_QLabel,
+    QWidget.lightTableElementMini QLabel.miniTable_QLabel,
+    QWidget.DarkTableElementMini QLabel.miniTable_QLabel{
         border:none;
         margin:0;
         padding: 10px 5px;
@@ -157,6 +175,15 @@ INTERPOLATION_TABLE_STYLES = """
         padding:0;
         border:none;
     }
+    QWidget.tableColsHeaderMini{
+        font-size: 18px;
+        max-width: 160px;
+        min-width: 160px;
+        background-color: rgb(180,230,180);
+        margin:0;
+        padding:0;
+        border:none;
+    }
     QWidget.tableColsHeaderLarge{
         font-size: 18px;
         max-width: 280px;
@@ -182,6 +209,14 @@ INTERPOLATION_TABLE_STYLES = """
         padding:0;
         border:none;
     }
+    QWidget.lightTableElementMini{
+        font-size: 18px;
+        max-width: 160px;
+        min-width: 160px;
+        margin:0;
+        padding:0;
+        border:none;
+    }
     QWidget.lightTableElementLarge{
         font-size: 18px;
         max-width: 280px;
@@ -203,6 +238,15 @@ INTERPOLATION_TABLE_STYLES = """
         font-size: 18px;
         max-width: 200px;
         min-width: 200px;
+        background-color: #e0e0e0;
+        margin:0;
+        padding:0;
+        border:none;
+    }
+    QWidget.DarkTableElementMini{
+        font-size: 18px;
+        max-width: 160px;
+        min-width: 160px;
         background-color: #e0e0e0;
         margin:0;
         padding:0;

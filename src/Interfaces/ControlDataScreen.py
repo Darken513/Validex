@@ -10,5 +10,14 @@ class Screen(RDS.Screen):
         self.seriesDatakey = 'CSD_series_nbr'
         self.dataFull = 'CD_full'
 
+    def onSubmit(self):
+        data = self.tableWrapper.fetchData()
+        event = {}
+        event = {
+            "msg":'submit', 
+            "data":{self.dataFull:data}
+        }
+        self.callbackParent(event)
+
     def callbackParent(self, event):
         self.mainScreen.onControlDataScreenEvent(event) 

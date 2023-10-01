@@ -1,9 +1,11 @@
 from PyQt4 import QtGui, QtCore
+from scipy import stats
 import BasicDataScreen
 import AccuracyVerification
 import ReconstitutedDataScreen
 import ControlDataScreen
 import LinearVerification
+from Utilities import AccuarcyMath, StudentTest
 import Utilities.Style as Style
 
 EMPTY_DATA = {
@@ -206,9 +208,86 @@ class Screen(QtGui.QMainWindow):
         elif(event['msg'] == 'unchanged'):
             self.initControldDataScreen()
 
+    def doMath(self):
+        data = {}      
+        data["listX"] = []
+        data["listY"] = []
+        for subarray in self.data["RD_full"]:
+            for i in range(len(subarray)):
+                data["listX"].append(subarray[i][0])
+                data["listY"].append(subarray[i][1])
+
+        slope, intercept, r_value, p_value, std_err = stats.linregress(data["listX"], data["listY"])
+
+        data["slope"] = slope
+        data["intercept"] = intercept
+        data["r_value"] = r_value
+
+        self.data['Reconstituted data graph (D1)'] = data
+
+        data = {}
+        data["listX"] = []
+        data["listY"] = []
+        for subarray in self.data["CD_full"]:
+            for i in range(len(subarray)):
+                data["listX"].append(subarray[i][0])
+                data["listY"].append(subarray[i][1])
+
+        slope, intercept, r_value, p_value, std_err = stats.linregress(data["listX"], data["listY"])
+
+        data["slope"] = slope
+        data["intercept"] = intercept
+        data["r_value"] = r_value
+        
+        self.data['Control data graph (D2)'] = data
+
+        data1 = self.data['Reconstituted data graph (D1)'] 
+        data2 = self.data['Control data graph (D2)']
+        
+        n1 = self.data["RSD_series_nbr"]
+        m1 = self.data["RSD_test_nbr"]
+        
+        n2 = self.data["CSD_series_nbr"]
+        m2 = self.data["CSD_test_nbr"]
+        
+        a1 = data1["intercept"]
+        a2 = data2["intercept"]
+        
+        b1 = data1["slope"]
+        b2 = data2["slope"]
+        
+        r1 = data1["r_value"]
+        r2 = data2["r_value"]
+        
+        xy1 = self.data["RD_full"]
+        xy2 = self.data["CD_full"]
+        
+        ICT_8 = StudentTest.calculate_TestT_ord(a1, a2, r1, r2, xy1, xy2)
+        ICT_98_CV = StudentTest.tStudentCV(0.05, (n1*m1 - 2)*2)
+        
+        error1 = (ICT_8 > ICT_98_CV)
+        CTSF_9 = "..." if error1 else StudentTest.calculate_TestT_pente(b1, b2, r1, r2, xy1, xy2)
+        
+        error2 = error1 or (CTSF_9 > ICT_98_CV)
+        ICT0_1 = "..." if error2 else StudentTest.calculate_TestT_ord0(a1, r1, xy1)
+        ICT0_2 = "..." if error2 else StudentTest.calculate_TestT_ord0(a2, r2, xy2)
+        ICT0_CV = "..." if error2 else StudentTest.tStudentCV(0.05, n1*m1 - 2)
+        
+        if(ICT_8 < ICT_98_CV and CTSF_9 < ICT_98_CV and ICT0_1 < ICT0_CV and ICT0_2 < ICT0_CV):
+            self.data['inputState'] = "100% standard"
+        elif(ICT_8 < ICT_98_CV and CTSF_9 < ICT_98_CV and not (ICT0_1 < ICT0_CV and ICT0_2 < ICT0_CV)):
+            self.data['inputState'] = "Calibration range"
+        else:
+            self.data['inputState'] = "error"
+        
+        self.data['days_B_case1'] = AccuarcyMath.calculateSlopePerSeries100(self.data["CD_full"], self.data["Refrence_idx"]-1)
+        self.data['days_B_A_case2'] = AccuarcyMath.calculateSlopePerSeries_CD(self.data["CD_full"])
+
+        
     def onControlDataScreenEvent(self, event):
         if(event['msg'] == 'submit' and event['data']):
             self.data["CD_full"] = event["data"]["CD_full"]
+            self.doMath()
             self.initLinearVerificationScreen()
 
         elif(event['msg'] == 'reset'):
