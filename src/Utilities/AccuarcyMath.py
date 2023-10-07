@@ -7,7 +7,7 @@ def calculateSlopePerSeries100(xy, refIdx):
     for testIndx in range(len(xy100)):
         x100 = xy100[testIndx][0]
         y100 = xy100[testIndx][1]
-        slopes.append(y100/x100)
+        slopes.append(round(y100/x100, 4))
     return {'slopes':slopes}
 
 def calculateSlopePerSeries_CD(xy):
@@ -21,6 +21,6 @@ def calculateSlopePerSeries_CD(xy):
             x.append(xy[serieIdx][testIndx][0])
             y.append(xy[serieIdx][testIndx][1])
         slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        data['slopes'].append(slope)
-        data['intercepts'].append(intercept)
+        data['slopes'].append(round(slope, 4))
+        data['intercepts'].append(round(intercept, 4))
     return data 

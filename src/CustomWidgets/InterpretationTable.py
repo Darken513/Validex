@@ -40,6 +40,7 @@ class InterpretationTable(QtGui.QWidget):
             lineLayout = QtGui.QHBoxLayout()
             lineLayout.setContentsMargins(0, 0, 0, 0)
             lineLayout.setSpacing(0)
+            lineLayout.addStretch(1)
             lineWidget = QtGui.QWidget()
             lineWidget.setLayout(lineLayout)
             if(row==0):
@@ -49,6 +50,7 @@ class InterpretationTable(QtGui.QWidget):
                 for col in range(0, len(self.colsLabels)+1):
                     self.buildDataCol(row, col, lineLayout)
             layout.addWidget(lineWidget)
+            lineLayout.addStretch(1)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet(Style.INTERPOLATION_TABLE_STYLES)
@@ -97,10 +99,8 @@ class InterpretationTable(QtGui.QWidget):
             elif(data[1] == 'minitable'):
                 headerWidget = QtGui.QWidget()
                 headerWidget.layout = QtGui.QHBoxLayout()
-                headerWidget.setLayout(headerWidget.layout)
                 dataWidget = QtGui.QWidget()
                 dataWidget.layout = QtGui.QHBoxLayout()
-                dataWidget.setLayout(dataWidget.layout)
 
                 for i in range(len(data[0])):
                     headerVal = data[0][i]
@@ -118,7 +118,10 @@ class InterpretationTable(QtGui.QWidget):
                     dataWidget.layout.addWidget(dataLabel)
                     dataWidget.layout.setContentsMargins(0, 0, 0, 0)
                     dataWidget.layout.setSpacing(0)
-                                
+                    
+                headerWidget.setLayout(headerWidget.layout)
+                dataWidget.setLayout(dataWidget.layout)
+
                 widget.layout.addWidget(headerWidget)
                 widget.layout.addWidget(dataWidget)
     
