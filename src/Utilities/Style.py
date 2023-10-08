@@ -127,8 +127,8 @@ INTERPOLATION_TABLE_STYLES = """
         border:none;
         margin:0;
         padding: 10px 5px;
-        max-width: 50px;
-        min-width: 50px;
+        max-width: 90px;
+        min-width: 90px;
     }
     QWidget.tableColsHeaderMini QLabel.miniTable_QLabel,
     QWidget.lightTableElementMini QLabel.miniTable_QLabel,
@@ -200,6 +200,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb;
     }
     QWidget.lightTableElementSmall{
         font-size: 18px;
@@ -208,6 +209,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.lightTableElementMini{
         font-size: 18px;
@@ -216,6 +218,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.lightTableElementLarge{
         font-size: 18px;
@@ -224,6 +227,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.DarkTableElement{
         font-size: 18px;
@@ -233,6 +237,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.DarkTableElementSmall{
         font-size: 18px;
@@ -242,6 +247,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.DarkTableElementMini{
         font-size: 18px;
@@ -251,6 +257,7 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
     QWidget.DarkTableElementLarge{
         font-size: 18px;
@@ -260,5 +267,6 @@ INTERPOLATION_TABLE_STYLES = """
         margin:0;
         padding:0;
         border:none;
+        border-bottom:1px solid #bbb
     }
 """

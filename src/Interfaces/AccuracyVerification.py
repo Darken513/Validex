@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 import CustomWidgets.InterpretationTable as IT
+from Utilities import CochrantTest, FisherTest
 import Utilities.mathUtils as mathUtils
 import Utilities.AccuarcyMath as AccuarcyMath
 
@@ -102,9 +103,9 @@ class Screen(QtGui.QWidget):
         n = len(data)
         m = len(data[0])
         
-        qi_x = []
-        qi_y = []
-        qr_x = []
+        self.data["qi_x"] = []
+        self.data["qi_y"] = []
+        self.data["qr_x"] = []
         for i in range(n):
             tempIx = []
             tempIy = []
@@ -113,22 +114,22 @@ class Screen(QtGui.QWidget):
                 tempIx.append(data[i][j][0])
                 tempIy.append(data[i][j][1])
                 tempR.append(round(data[i][j][1] / slopes[j], 2) if isStandard else round((data[i][j][1] - intercepts[j]) / slopes[j], 2))
-            qi_x.append(tempIx)
-            qi_y.append(tempIy)
-            qr_x.append(tempR)
+            self.data["qi_x"].append(tempIx)
+            self.data["qi_y"].append(tempIy)
+            self.data["qr_x"].append(tempR)
             
-        recoveries = []
+        self.data["recoveries"] = []
         for i in range(n):
             temp = []
             for j in range(m):
-                temp.append(round((qr_x[i][j] / data[i][j][0])*100, 2))
-            recoveries.append(temp)
+                temp.append(round((self.data["qr_x"][i][j] / data[i][j][0])*100, 2))
+            self.data["recoveries"].append(temp)
         
-        s2j = []
+        self.data["s2j"] = []
         for i in range(n):
-            mean_y = sum(recoveries[i]) / m
-            variance = sum((y - mean_y)**2 for y in recoveries[i]) / (m-1)
-            s2j.append(variance)
+            mean_y = sum(self.data["recoveries"][i]) / m
+            variance = sum((y - mean_y)**2 for y in self.data["recoveries"][i]) / (m-1)
+            self.data["s2j"].append(variance)
             
         sideLabels = []
         for i in range(n):
@@ -146,11 +147,11 @@ class Screen(QtGui.QWidget):
         tableData = []
         for i in range(n):
             line = []
-            line.append([self.intArray_toStrArray(qi_x[i]), 'multilines'])
-            line.append([self.intArray_toStrArray(qi_y[i]), 'multilines'])
-            line.append([self.intArray_toStrArray(qr_x[i]), 'multilines'])
-            line.append([self.intArray_toStrArray(recoveries[i]), 'multilines'])
-            line.append(str(round(s2j[i], 5)))
+            line.append([self.intArray_toStrArray(self.data["qi_x"][i]), 'multilines'])
+            line.append([self.intArray_toStrArray(self.data["qi_y"][i]), 'multilines'])
+            line.append([self.intArray_toStrArray(self.data["qr_x"][i]), 'multilines'])
+            line.append([self.intArray_toStrArray(self.data["recoveries"][i]), 'multilines'])
+            line.append(str(round(self.data["s2j"][i], 5)))
             tableData.append(line)
             
         widget = IT.InterpretationTable(
@@ -180,17 +181,43 @@ class Screen(QtGui.QWidget):
         headers = []
         for i in range(1, m+1):
             headers.append('Day'+str(i))
-        print((len(headers)+1))
         widget = IT.InterpretationTable(
             ['Slopes'] if isStandard else ['Slopes', 'Intercepts'],
             headers,
             [ self.intArray_toStrArray(slopes) ] if isStandard else [ self.intArray_toStrArray(slopes), self.intArray_toStrArray(intercepts) ],
             ['mini']*(len(headers)+1)
         )
+        widget.layout.setContentsMargins(0, 20, 0, 0)
         self.contentHolderLayout.addWidget(widget)
     
     def drawFirstInterpretationTable(self):
-        pass
+        data = self.mainScreen.data['RD_full']
+        n = len(data)
+        m = len(data[0])
+        CC = round(max(self.data["s2j"])/sum(self.data["s2j"]), 3)
+        CT = CochrantTest.cochranCVTable(0.05, n, m-1)
+
+        FT = FisherTest.fisherCVTable(0.05, n-1, n*m-n)
+        
+        widget = IT.InterpretationTable(
+            ["Homogenity of variances test", "Test of validity of averages"],
+            ["Calculated value", "Tabulated value", "Interpretation"],
+            [
+                [ 
+                    CC,
+                    CT, 
+                    "Variances are homogeneous <br> at risk alpha 0.05" if CC < CT else "Variances are not homogeneous <br> at risk alpha 0.05"
+                ],
+                [
+                    1, 
+                    FT, 
+                    3
+                ] 
+            ],
+            ['large', "small", "small", "large"]
+        )
+        widget.layout.setContentsMargins(0, 20, 0, 0)
+        self.contentHolderLayout.addWidget(widget)
     
     def drawSecondInterpretationTable(self):
         pass

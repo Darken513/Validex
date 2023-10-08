@@ -33,8 +33,8 @@ class InterpretationTable(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QtGui.QVBoxLayout()
-        self.setLayout(layout)
+        self.layout = QtGui.QVBoxLayout()
+        self.setLayout(self.layout)
         numberOfRows = len(self.rowsLabels) + ( 1 if len(self.colsLabels) else 0 )
         for row in range(0, numberOfRows):
             lineLayout = QtGui.QHBoxLayout()
@@ -49,10 +49,10 @@ class InterpretationTable(QtGui.QWidget):
             else:
                 for col in range(0, len(self.colsLabels)+1):
                     self.buildDataCol(row, col, lineLayout)
-            layout.addWidget(lineWidget)
+            self.layout.addWidget(lineWidget)
             lineLayout.addStretch(1)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet(Style.INTERPOLATION_TABLE_STYLES)
         
     def buildHeaderCol(self, data, col, lineLayout):
