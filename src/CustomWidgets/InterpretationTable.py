@@ -35,7 +35,7 @@ class InterpretationTable(QtGui.QWidget):
     def initUI(self):
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
-        numberOfRows = len(self.rowsLabels) + ( 1 if len(self.colsLabels) else 0 )
+        numberOfRows = len(self.data) + ( 1 if len(self.colsLabels) else 0 )
         for row in range(0, numberOfRows):
             lineLayout = QtGui.QHBoxLayout()
             lineLayout.setContentsMargins(0, 0, 0, 0)
@@ -44,10 +44,10 @@ class InterpretationTable(QtGui.QWidget):
             lineWidget = QtGui.QWidget()
             lineWidget.setLayout(lineLayout)
             if(row==0):
-                for col in range(0, len(self.colsLabels)+1):
+                for col in range(0, len(self.colsLabels) + ( 1 if len(self.rowsLabels) else 0 )):
                     self.buildHeaderCol(self.colsLabels[col-1], col, lineLayout)
             else:
-                for col in range(0, len(self.colsLabels)+1):
+                for col in range(0, len(self.colsLabels) + ( 1 if len(self.rowsLabels) else 0 )):
                     self.buildDataCol(row, col, lineLayout)
             self.layout.addWidget(lineWidget)
             lineLayout.addStretch(1)
@@ -57,7 +57,7 @@ class InterpretationTable(QtGui.QWidget):
         
     def buildHeaderCol(self, data, col, lineLayout):
         widget = QtGui.QWidget()
-        label = QtGui.QLabel('' if col==0 else data)
+        label = QtGui.QLabel('' if col==0 and len(self.rowsLabels) else data)
         widget.setProperty('class', self.getColHeaderStyle(col))
         label.setAlignment(QtCore.Qt.AlignCenter)
         widget.layout = QtGui.QVBoxLayout()
@@ -73,7 +73,7 @@ class InterpretationTable(QtGui.QWidget):
         widget.layout.setSpacing(0)
         widget.setLayout(widget.layout)
         widget.setProperty('class', self.getColElementStyle(col, not row%2))
-        data = self.rowsLabels[row-1] if col==0 else self.data[row-1][col-1]
+        data = self.rowsLabels[row-1] if col==0 and len(self.rowsLabels) else self.data[row-1][col-1]
         if isinstance(data, str) or isinstance(data, float) or isinstance(data, int) :
             label = QtGui.QLabel(str(data))
             label.setAlignment(QtCore.Qt.AlignCenter)

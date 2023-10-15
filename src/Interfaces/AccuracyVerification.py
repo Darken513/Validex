@@ -1,8 +1,8 @@
 from PyQt4 import QtGui, QtCore
 import CustomWidgets.InterpretationTable as IT
-from Utilities import CochrantTest, FisherTest
-import Utilities.mathUtils as mathUtils
-import Utilities.AccuarcyMath as AccuarcyMath
+from Utilities import CochrantTest, FisherTest, StudentTest
+import numpy as np
+import math
 
 class Screen(QtGui.QWidget):
     def __init__(self, mainScreen):
@@ -93,6 +93,11 @@ class Screen(QtGui.QWidget):
         temp = []
         for i in range(len(arr)):
             temp.append(str(arr[i]))
+        return temp
+    def strArray_tointArray(self, arr):
+        temp = []
+        for i in range(len(arr)):
+            temp.append(int(arr[i]))
         return temp
     
     def drawGeneralMathTable(self):
@@ -199,6 +204,17 @@ class Screen(QtGui.QWidget):
 
         FT = FisherTest.fisherCVTable(0.05, n-1, n*m-n)
         
+        Y = np.array([[0.0]*m]*n)
+        for j in range(n):
+            for i in range(m):
+                Y[j][i] = self.data['recoveries'][j][i]
+        SumT2 = FisherTest.calculate_VTotal(n, m, Y)
+        SumE2 = FisherTest.calculate_VerreurExp(n, m, Y)*(n*m - n)
+        varE2 = SumE2/(n*m - n)
+        SumC2 = SumT2 - SumE2
+        varC2 = SumC2/(n-1)
+        F3 = round(varC2/varE2, 2)
+        
         widget = IT.InterpretationTable(
             ["Homogenity of variances test", "Test of validity of averages"],
             ["Calculated value", "Tabulated value", "Interpretation"],
@@ -209,9 +225,9 @@ class Screen(QtGui.QWidget):
                     "Variances are homogeneous <br> at risk alpha 0.05" if CC < CT else "Variances are not homogeneous <br> at risk alpha 0.05"
                 ],
                 [
-                    1, 
+                    F3, 
                     FT, 
-                    3
+                    "Non significant" if FT > F3 else "Significant"
                 ] 
             ],
             ['large', "small", "small", "large"]
@@ -220,4 +236,21 @@ class Screen(QtGui.QWidget):
         self.contentHolderLayout.addWidget(widget)
     
     def drawSecondInterpretationTable(self):
-        pass
+        data = self.mainScreen.data['RD_full']
+        n = len(data)
+        m = len(data[0])
+        recoveries = np.array(self.data['recoveries'])
+        AVG_recov = round(sum(sum(recoveries))/(n*m), 3)
+        
+        std_deviation = np.std(recoveries)
+        ICRange = round(StudentTest.tStudentCV(0.05, (n*m)-1)*std_deviation/math.sqrt(n*m-1), 2)
+        print("L'ecart type est :", ICRange)
+        print(StudentTest.tStudentCV(0.05, (n*m)-1))
+        widget = IT.InterpretationTable(
+            [],
+            ["Confidence interval", "Average of recoveries"],
+            [[str(AVG_recov)+"% with a range <br>of "+str(ICRange)+"% meaning <br>"+str(AVG_recov-ICRange)+" to "+str(AVG_recov+ICRange)+"%", str(AVG_recov)+"%"]],
+            ['large', 'large']
+        )
+        widget.layout.setContentsMargins(0, 20, 0, 0)
+        self.contentHolderLayout.addWidget(widget)

@@ -7,7 +7,7 @@ def calculateSlopePerSeries100(xy, refIdx):
     for testIndx in range(len(xy100)):
         x100 = xy100[testIndx][0]
         y100 = xy100[testIndx][1]
-        slopes.append(round(y100/x100, 4))
+        slopes.append(round(y100/x100, 4)) #to do avoid division per zero
     return {'slopes':slopes}
 
 def calculateSlopePerSeries_CD(xy):

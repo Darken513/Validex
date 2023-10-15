@@ -16,7 +16,14 @@ def calculate_VTotal(n, m, Yij):
         for i in range(m):
             toret += (Yij[j][i] - Y)**2
     return toret   
-     
+
+def calculate_VTotalExactitude(n, m, slope, intercept, XY):
+    toret = 0
+    for j in range(n):
+        for i in range(m):
+            toret += (XY[j][i][1] - (intercept + slope*XY[j][i][0]))**2
+    return toret
+
 def calculate_Vregression(n, m, b, Xbars):
     X = sum(Xbars)/n
     toret = 0
